@@ -59,6 +59,38 @@ long get_pll1(__ccmu_reg_list_t * ccmu)
 	return (24000000 * N * K) / (M * P);
 }
 
+enum PLL5_GET_MODE {
+	PLL5_GET_MODE_DRAM,
+	PLL5_GET_MODE_OTHER
+};
+
+long get_pll5_inner(__ccmu_reg_list_t * ccmu, enum PLL5_GET_MODE mode)
+{
+	int M, K, N, P;
+	__ccmu_pll5_ddr_reg0020_t *pll = &ccmu->Pll5Ctl;
+	M = pll->FactorM + 1;
+	K = pll->FactorK + 1;
+	N = pll->FactorN;
+	P = 1 << pll->PLLDivP;
+	switch(mode) {
+	case PLL5_GET_MODE_DRAM:
+		return (24000000 * N * K) / M;
+	case PLL5_GET_MODE_OTHER:
+		return (24000000 * N * K) / P;
+	default: fprintf(stderr, "INTERNAL ERROR!\n"); exit(1);
+	}
+}
+
+long get_dram(__ccmu_reg_list_t * ccmu)
+{
+	return get_pll5_inner(ccmu, PLL5_GET_MODE_DRAM);
+}
+
+long get_pll5(__ccmu_reg_list_t * ccmu)
+{
+	return get_pll5_inner(ccmu, PLL5_GET_MODE_OTHER);
+}
+
 long get_cpu(__ccmu_reg_list_t * ccmu)
 {
 	switch (ccmu->SysClkDiv.CPUClkSrc) {
@@ -126,12 +158,16 @@ int main(int argc, char **argv)
 	__ccmu_reg_list_t ccmu;
 	char *ccm = mmap_io(0x1c20000, sizeof(ccmu));
 	memcpy(&ccmu, ccm, sizeof(ccmu));
-	printf("SYSCLKDIV: %08x\n", *(__u32 *)&ccmu.SysClkDiv);
+	printf("PLL1CTL   : %08x\n", *(__u32 *)&ccmu.Pll1Ctl);
 	printf("CPU : %7.2f MHz\n", get_cpu(&ccmu) / 1000000.0);
+	printf("SYSCLKDIV : %08x\n", *(__u32 *)&ccmu.SysClkDiv);
 	printf("ATB : %7.2f MHz\n", get_atb(&ccmu) / 1000000.0);
 	printf("AXI : %7.2f MHz\n", get_axi(&ccmu) / 1000000.0);
 	printf("AHB : %7.2f MHz\n", get_ahb(&ccmu) / 1000000.0);
 	printf("APB0: %7.2f MHz\n", get_apb0(&ccmu) / 1000000.0);
 	printf("APB1CLKDIV: %08x\n", *(__u32 *)&ccmu.Apb1ClkDiv);
 	printf("APB1: %7.2f MHz\n", get_apb1(&ccmu) / 1000000.0);
+	printf("DRAM: %7.2f MHz\n", get_dram(&ccmu) / 1000000.0);
+	printf("PLL5CTL   : %08x\n", *(__u32 *)&ccmu.Pll5Ctl);
+	printf("PLL5: %7.2f MHz\n", get_pll5(&ccmu) / 1000000.0);
 }

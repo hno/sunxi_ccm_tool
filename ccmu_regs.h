@@ -124,7 +124,7 @@ typedef struct __CCMU_PLL5_DDR_REG0020
     __u32   LDO2En:1;           //bit7,  LDO2 enable
     __u32   FactorN:5;          //bit8,  PLL5 factor N
     __u32   VCOGain:3;          //bit13, PLL5 VCO gain control
-    __u32   FactorP:2;          //bit16, PLL5 output external divider P
+    __u32   PLLDivP:2;          //bit16, PLL5 output external divider P
     __u32   BandWidth:1;        //bit18, PLL5 band width control, 0-narrow, 1-wide
     __u32   VCOGainEn:1;        //bit19, PLL5 VCO gain control enable
     __u32   PLLBias:5;          //bit20, PLL5 bias current control

@@ -573,6 +573,15 @@ typedef struct __CCMU_MALI400_CLK_REG0154
     __u32   SpecClkGate:1;      //bit31, Gating special clock, 0-clock off, 1-clock on
 } __ccmu_mali400_clk_reg0154_t;
 
+typedef struct __CCMU_MBUS_CLK_REG015C {
+    __u32   ClkDivM: 4;         //bit0,  clock divide ratioM
+    __u32   reserved0: 12;      //bit4,  reserved
+    __u32   ClkDivN: 2;         //bit16, clock pre-divide ratio, pre-divided by 2^n, 1/2/4/8 ex.
+    __u32   reserved1: 6;       //bit18, reserved
+    __u32   ClkSrc: 2;          //bit24, clock select, 00-HOSC, 01-PLL6*2, 10-PLL5, 11-reserved
+    __u32   reserved2: 5;       //bit26, reserved
+    __u32   ClkGate: 1;         //bit31, gating special clock, 0-CLOCK OFF, 1-CLOCK ON
+} __ccmu_mbus_clk_reg015c_t;
 
 
 typedef struct __CCMU_REG_LIST
@@ -648,6 +657,8 @@ typedef struct __CCMU_REG_LIST
     volatile __ccmu_lvds_clk_reg014c_t      LvdsClk;    //0x014C, LVDS module clock control
     volatile __ccmu_hdmi_clk_reg0150_t      HdmiClk;    //0x0150, HDMI module clock control
     volatile __ccmu_mali400_clk_reg0154_t   MaliClk;    //0x0154, MALI400 module clock control
+    volatile __u32                          reserved13; //0x0158, reserved
+    volatile __ccmu_mbus_clk_reg015c_t      MBusClk;    //0x015C, MBus module clock control
 
 } __ccmu_reg_list_t;
 

@@ -91,6 +91,48 @@ long get_pll5(__ccmu_reg_list_t * ccmu)
 	return get_pll5_inner(ccmu, PLL5_GET_MODE_OTHER);
 }
 
+enum PLL6_GET_MODE {
+	PLL6_GET_MODE_SATA,
+	PLL6_GET_MODE_PLL6, /* PLL6 */
+	PLL6_GET_MODE_PLL62, /* PLL6*2 */
+	PLL6_GET_MODE_200,
+};
+
+long get_pll6_inner(__ccmu_reg_list_t * ccmu, enum PLL6_GET_MODE mode)
+{
+	int M, K, N;
+	__ccmu_pll6_sata_reg0028_t *pll = &ccmu->Pll6Ctl;
+	M = pll->FactorM + 1;
+	K = pll->FactorK + 1;
+	N = pll->FactorN;
+	switch(mode) {
+	case PLL6_GET_MODE_SATA:
+		return (24000000 * N * K) / M / 6;
+	case PLL6_GET_MODE_PLL6:
+		return (24000000 * N * K) / 2;
+	case PLL6_GET_MODE_PLL62:
+		return (24000000 * N * K);
+	case PLL6_GET_MODE_200:
+		return (200000000); /* This should be derived somehow */
+	default: fprintf(stderr, "INTERNAL ERROR!\n"); exit(1);
+	}
+}
+
+long get_sata(__ccmu_reg_list_t * ccmu)
+{
+	return get_pll6_inner(ccmu, PLL6_GET_MODE_SATA);
+}
+
+long get_pll6(__ccmu_reg_list_t * ccmu)
+{
+	return get_pll6_inner(ccmu, PLL6_GET_MODE_PLL6);
+}
+
+long get_pll62(__ccmu_reg_list_t * ccmu)
+{
+	return get_pll6_inner(ccmu, PLL6_GET_MODE_PLL62);
+}
+
 long get_cpu(__ccmu_reg_list_t * ccmu)
 {
 	switch (ccmu->SysClkDiv.CPUClkSrc) {
@@ -153,21 +195,42 @@ long get_apb1(__ccmu_reg_list_t * ccmu)
 	return src / div;
 }
 
+long get_mbus(__ccmu_reg_list_t * ccmu)
+{
+	__ccmu_mbus_clk_reg015c_t *mbus = &ccmu->MBusClk;
+	long src;
+	switch ( mbus->ClkSrc ) {
+	case 0: src = 24000000; break;
+	case 1: src = get_pll62(ccmu); break;
+	case 2: src = get_pll5(ccmu); break;
+	default: fprintf(stderr, "Unhandled MBUSClkSrc(%d)\n", mbus->ClkSrc); exit(1);
+	}
+	int N = 1 << mbus->ClkDivN;
+	int M = mbus->ClkDivM + 1;
+	return src / N / M;
+}
+
 int main(int argc, char **argv)
 {
 	__ccmu_reg_list_t ccmu;
 	char *ccm = mmap_io(0x1c20000, sizeof(ccmu));
 	memcpy(&ccmu, ccm, sizeof(ccmu));
 	printf("PLL1CTL   : %08x\n", *(__u32 *)&ccmu.Pll1Ctl);
-	printf("CPU : %7.2f MHz\n", get_cpu(&ccmu) / 1000000.0);
+	printf("CPU       : %7.2f MHz\n", get_cpu(&ccmu) / 1000000.0);
 	printf("SYSCLKDIV : %08x\n", *(__u32 *)&ccmu.SysClkDiv);
-	printf("ATB : %7.2f MHz\n", get_atb(&ccmu) / 1000000.0);
-	printf("AXI : %7.2f MHz\n", get_axi(&ccmu) / 1000000.0);
-	printf("AHB : %7.2f MHz\n", get_ahb(&ccmu) / 1000000.0);
-	printf("APB0: %7.2f MHz\n", get_apb0(&ccmu) / 1000000.0);
+	printf("ATB       : %7.2f MHz\n", get_atb(&ccmu) / 1000000.0);
+	printf("AXI       : %7.2f MHz\n", get_axi(&ccmu) / 1000000.0);
+	printf("AHB       : %7.2f MHz\n", get_ahb(&ccmu) / 1000000.0);
+	printf("APB0      : %7.2f MHz\n", get_apb0(&ccmu) / 1000000.0);
 	printf("APB1CLKDIV: %08x\n", *(__u32 *)&ccmu.Apb1ClkDiv);
-	printf("APB1: %7.2f MHz\n", get_apb1(&ccmu) / 1000000.0);
-	printf("DRAM: %7.2f MHz\n", get_dram(&ccmu) / 1000000.0);
+	printf("APB1      : %7.2f MHz\n", get_apb1(&ccmu) / 1000000.0);
+	printf("DRAM      : %7.2f MHz\n", get_dram(&ccmu) / 1000000.0);
 	printf("PLL5CTL   : %08x\n", *(__u32 *)&ccmu.Pll5Ctl);
-	printf("PLL5: %7.2f MHz\n", get_pll5(&ccmu) / 1000000.0);
+	printf("PLL5      : %7.2f MHz\n", get_pll5(&ccmu) / 1000000.0);
+	printf("SATA      : %7.2f MHz\n", get_sata(&ccmu) / 1000000.0);
+	printf("PLL6      : %7.2f MHz\n", get_pll6(&ccmu) / 1000000.0);
+	printf("PLL62     : %7.2f MHz\n", get_pll62(&ccmu) / 1000000.0);
+	printf("MBUSCLK   : %08x\n", *(__u32 *)&ccmu.MBusClk);
+	printf("MBUS      : %7.2f MHz\n", get_mbus(&ccmu) / 1000000.0);
+	return 0;
 }

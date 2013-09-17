@@ -202,6 +202,21 @@ typedef struct __CCMU_PLL5_TUNING2_REG003C
 } __ccmu_pll5_tuning2_reg003c_t;
 
 
+typedef struct __CCMU_PLL8_GPU_REG0040 {
+    __u32   FactorM: 2;         //bit0,  PLL8 factor M
+    __u32   reserved0: 2;       //bit2,  reserved
+    __u32   FactorK: 2;         //bit4,  PLL8 factor K
+    __u32   DampFactor: 2;      //bit6,  PLL8 damping factor control
+    __u32   FactorN: 5;         //bit8,  PLL8 factor N
+    __u32   reserved1: 2;       //bit13, reserved
+    __u32   BandWidth: 1;       //bit15, PLL8 band width control
+    __u32   reserved2: 4;       //bit16, reserved
+    __u32   PLLBias: 5;         //bit20, PLL8 bias current control
+    __u32   VCOBias: 5;         //bit25, PLL8 VCO bias
+    __u32   PLLBypass: 1;       //bit30, PLL8 output bypass enable
+    __u32   PLLEn: 1;           //bit31, PLL8 enable
+} __ccmu_pll8_gpu_reg0040_t;
+
 typedef struct __CCMU_OSC24M_REG0050
 {
     __u32   OSC24MEn:1;         //bit0,  OSC24M enable
@@ -277,7 +292,9 @@ typedef struct __CCMU_AHBCLK_GATE0_REG0060
     __u32   PataGate:1;         //bit24, gating AHB clock for PATA, 0-mask, 1-pass
     __u32   SataGate:1;         //bit25, gating AHB clock for SATA, 0-mask, 1-pass
     __u32   GpsGate:1;          //bit26, gating AHB clock for GPS, 0-mask, 1-pass
-    __u32   reserved4:5;        //bit27, reserved
+    __u32   reserved4:1;        //bit27, reserved
+    __u32   StmrGate: 1;        //bit28, gating AHB clock for Sync timer
+    __u32   reserved5:3;        //bit27, reserved
 } __ccmu_ahbclk_gate0_reg0060_t;
 
 
@@ -292,17 +309,18 @@ typedef struct __CCMU_AHBCLK_GATE1_REG0064
     __u32   reserved0:2;        //bit6,  reserved
     __u32   Csi0Gate:1;         //bit8,  gating AHB clock for CSI0, 0-mask, 1-pass
     __u32   Csi1Gate:1;         //bit9,  gating AHB clock for CSI1, 0-mask, 1-pass
-    __u32   reserved1:1;        //bit10, reserved
+    __u32   Hdmi1Gate: 1;       //bit10, gating AHB clock for HDMI1
     __u32   HdmiDGate:1;        //bit11, gating AHB clock for HDMI, 0-mask, 1-pass
     __u32   DeBe0Gate:1;        //bit12, gating AHB clock for DE-BE0, 0-mask, 1-pass
     __u32   DeBe1Gate:1;        //bit13, gating AHB clock for DE-BE1, 0-mask, 1-pass
     __u32   DeFe0Gate:1;        //bit14, gating AHB clock for DE-FE0, 0-mask, 1-pass
     __u32   DeFe1Gate:1;        //bit15, gating AHB clock for DE-FE1, 0-mask, 1-pass
-    __u32   reserved2:2;        //bit16, reserved
+    __u32   reserved1:1;        //bit16, reserved
+    __u32   GmacGate: 1;        //bit17, gating AHB clock for GMAC, 0-mask, 1:pass
     __u32   MpGate:1;           //bit18, gating AHB clock for MP, 0-mask, 1-pass
-    __u32   reserved3:1;        //bit19, reserved
+    __u32   reserved2:1;        //bit19, reserved
     __u32   Gpu3DGate:1;        //bit20, gating AHB clock for GPU-3D, 0-mask, 1-pass
-    __u32   reserved4:11;       //bit21, reserved
+    __u32   reserved3:11;       //bit21, reserved
 } __ccmu_ahbclk_gate1_reg0064_t;
 
 
@@ -322,40 +340,43 @@ typedef struct __CCMU_APB0CLK_GATE_REG0068
 } __ccmu_apb0clk_gate_reg0068_t;
 
 
-typedef struct __CCMU_APB1CLK_GATE_REG006C
-{
-    __u32   Twi0Gate:1;         //bit0,  gating APB clock for TWI0, 0-mask, 1-pass
-    __u32   Twi1Gate:1;         //bit1,  gating APB clock for TWI1, 0-mask, 1-pass
-    __u32   Twi2Gate:1;         //bit2,  gating APB clock for TWI2, 0-mask, 1-pass
-    __u32   reserved0:1;        //bit3,  reserved
-    __u32   CanGate:1;          //bit4,  gating APB clock for CAN, 0-mask, 1-pass
-    __u32   ScrGate:1;          //bit5,  gating APB clock for SCR, 0-mask, 1-pass
-    __u32   Ps20Gate:1;         //bit6,  gating APB clock for PS2-0, 0-mask, 1-pass
-    __u32   Ps21Gate:1;         //bit7,  gating APB clock for PS2-1, 0-mask, 1-pass
-    __u32   reserved1:8;        //bit8,  reserved
-    __u32   Uart0Gate:1;        //bit16, gating APB clock for UART0, 0-mask, 1-pass
-    __u32   Uart1Gate:1;        //bit17, gating APB clock for UART1, 0-mask, 1-pass
-    __u32   Uart2Gate:1;        //bit18, gating APB clock for UART2, 0-mask, 1-pass
-    __u32   Uart3Gate:1;        //bit19, gating APB clock for UART3, 0-mask, 1-pass
-    __u32   Uart4Gate:1;        //bit20, gating APB clock for UART4, 0-mask, 1-pass
-    __u32   Uart5Gate:1;        //bit21, gating APB clock for UART5, 0-mask, 1-pass
-    __u32   Uart6Gate:1;        //bit22, gating APB clock for UART6, 0-mask, 1-pass
-    __u32   Uart7Gate:1;        //bit23, gating APB clock for UART7, 0-mask, 1-pass
-    __u32   reserved2:8;        //bit24, reserved
+typedef struct __CCMU_APB1CLK_GATE_REG006C {
+    __u32   Twi0Gate: 1;        //bit0,  gating APB clock for TWI0, 0-mask, 1-pass
+    __u32   Twi1Gate: 1;        //bit1,  gating APB clock for TWI1, 0-mask, 1-pass
+    __u32   Twi2Gate: 1;        //bit2,  gating APB clock for TWI2, 0-mask, 1-pass
+    __u32   Twi3Gate: 1;        //bit3,  gating APB clock for TWI3, 0-mask, 1-pass
+    __u32   CanGate: 1;         //bit4,  gating APB clock for CAN, 0-mask, 1-pass
+    __u32   ScrGate: 1;         //bit5,  gating APB clock for SCR, 0-mask, 1-pass
+    __u32   Ps20Gate: 1;        //bit6,  gating APB clock for PS2-0, 0-mask, 1-pass
+    __u32   Ps21Gate: 1;        //bit7,  gating APB clock for PS2-1, 0-mask, 1-pass
+    __u32   reserved0: 7;       //bit8,  reserved
+    __u32   Twi4Gate: 1;        //bit15, gating AHB clock for TWI4, 0-mask, 1-pass
+    __u32   Uart0Gate: 1;       //bit16, gating APB clock for UART0, 0-mask, 1-pass
+    __u32   Uart1Gate: 1;       //bit17, gating APB clock for UART1, 0-mask, 1-pass
+    __u32   Uart2Gate: 1;       //bit18, gating APB clock for UART2, 0-mask, 1-pass
+    __u32   Uart3Gate: 1;       //bit19, gating APB clock for UART3, 0-mask, 1-pass
+    __u32   Uart4Gate: 1;       //bit20, gating APB clock for UART4, 0-mask, 1-pass
+    __u32   Uart5Gate: 1;       //bit21, gating APB clock for UART5, 0-mask, 1-pass
+    __u32   Uart6Gate: 1;       //bit22, gating APB clock for UART6, 0-mask, 1-pass
+    __u32   Uart7Gate: 1;       //bit23, gating APB clock for UART7, 0-mask, 1-pass
+    __u32   reserved1: 8;       //bit24, reserved
 } __ccmu_apb1clk_gate_reg006c_t;
 
 
 /* module clock type 0, used for NAND, MS, SDMMC0/1/2/3, TS, SS, SPI0/1/2/3, PATA, IR0/1, */
 /* register address is 0x0080~0x00B4, 0x00D4 */
-typedef struct __CCMU_MODULE0_CLK
-{
-    __u32   ClkDiv:4;           //bit0,  clock divide ratio, divided by (m+1), 1~16 ex.
-    __u32   reserved0:12;       //bit4,  reserved
-    __u32   ClkPreDiv:2;        //bit16, clock pre-divide ratio, predivided by 2^n , 1/2/4/8 ex.
-    __u32   reserved1:6;        //bit18, reserved
-    __u32   ClkSrc:2;           //bit24, clock source select, 00-HOSC, 01-PLL6, 10-PLL5, 11-reserved
-    __u32   reserved2:5;        //bit26, reserved
-    __u32   SpecClkGate:1;      //bit31, Gating special clock, 0-CLOCK OFF, 1-CLOCK ON
+typedef struct __CCMU_MODULE0_CLK {
+    __u32   ClkDiv: 4;          //bit0,  clock divide ratio, divided by (m+1), 1~16 ex.
+    __u32   reserved0: 4;       //bit4,  reserved
+    __u32   OutClkPhase: 3;     //bit8,  Just for SDMMC0/1/2/3, Output Clock Phase Control
+    __u32   reserved1: 5;       //bit11, reserved
+    __u32   ClkPreDiv: 2;       //bit16, clock pre-divide ratio, predivided by 2^n , 1/2/4/8 ex.
+    __u32   reserved2: 2;       //bit18, reserved
+    __u32   SampleClkPhase: 3;  //bit20, Just for SDMMC0/1/2/3, Sample Clock Phase Control.
+    __u32   reserved3: 1;       //bit23, reserved
+    __u32   ClkSrc: 2;          //bit24, clock source select, 00-HOSC, 01-PLL6, 10-PLL5, 11-reserved(LOSC,just for IR0/1)
+    __u32   reserved4: 5;       //bit26, reserved
+    __u32   SpecClkGate: 1;     //bit31, Gating special clock, 0-CLOCK OFF, 1-CLOCK ON
 } __ccmu_module0_clk_t;
 
 
@@ -473,14 +494,18 @@ typedef struct __CCMU_CSIISP_CLK_REG0120
     __u32   SpecClkGate:1;      //bit31, gating special clock, 0-clock off, 1-clock on
 } __ccmu_csiisp_clk_reg0120_t;
 
-typedef struct __CCMU_TVD_CLK_REG0128
-{
-    __u32   reserved0:24;       //bit0,  reserved
-    __u32   ClkSrc:1;           //bit24, clock source select, 0-PLL3, 1-PLL7
-    __u32   reserved1:6;        //bit25, reserved
-    __u32   SpecClkGate:1;      //bit31, gating special clock, 0-clock off, 1-clock on
+typedef struct __CCMU_TVD_CLK_REG0128 {
+    __u32   Clk1Div: 4;         //bit0, Clock divide ratio1(M)
+    __u32   reserved0: 4;       //bit4, reserved
+    __u32   Clk1Src: 1;         //bit8, clock1 source select, 0-PLL3, 1-PLL7
+    __u32   reserved1: 6;       //bit9, reserved
+    __u32   Clk1Gate: 1;        //bit15, gating special clock, 0-clock off, 1-clock on
+    __u32   Clk2Div: 4;         //bit16, Clock divide ratio2(M)
+    __u32   reserved2: 4;       //bit20, reserved
+    __u32   Clk2Src: 1;         //bit24, clock2 source select, 0-PLL3, 1-PLL7
+    __u32   reserved3: 6;       //bit25, reserved
+    __u32   Clk2Gate: 1;        //bit31, gating special clock, 0-clock off, 1-clock on
 } __ccmu_tvd_clk_reg0128_t;
-
 
 /* LCD-CH1 module clock type, used for LCD0_CH1, LCD1_CH1 */
 /* register address is 0x012C~0x0130 */
@@ -567,8 +592,8 @@ typedef struct __CCMU_MALI400_CLK_REG0154
 {
     __u32   ClkDiv:4;           //bit0,  clock divide ratio, divided by (m+1), 1~16 ex.
     __u32   reserved0:20;       //bit4,  reserved
-    __u32   ClkSrc:2;           //bit24, clolck source select, 00-PLL3, 01-PLL4, 10-PLL5, 11-PLL7
-    __u32   reserved1:4;        //bit26, reserved
+    __u32   ClkSrc:3;           //bit24, clolck source select, 000-PLL3, 001-PLL4, 010-PLL5, 011-PLL7, 100-pll8, 101~111-reserved
+    __u32   reserved1:3;        //bit26, reserved
     __u32   Reset:1;            //bit30, Mali400 reset, 0-reset valid, 1-reset invalid
     __u32   SpecClkGate:1;      //bit31, Gating special clock, 0-clock off, 1-clock on
 } __ccmu_mali400_clk_reg0154_t;
@@ -582,6 +607,53 @@ typedef struct __CCMU_MBUS_CLK_REG015C {
     __u32   reserved2: 5;       //bit26, reserved
     __u32   ClkGate: 1;         //bit31, gating special clock, 0-CLOCK OFF, 1-CLOCK ON
 } __ccmu_mbus_clk_reg015c_t;
+
+typedef struct __CCMU_GMAC_CLK_REG0164 {
+    __u32   TxClkSrc: 2;        //bit0,  GMAC Transmit Clock Source
+    __u32   PhyIT: 1;           //bit2,  GMAC Phy Interface Type
+    __u32   TxClkInv: 1;        //bit3,  Enable GMAC Transmit Clock Invertor, 0-Disable, 1-Enable
+    __u32   RxClkInv: 1;        //bit4,  Enable GMAC Receive Clock Invertor
+    __u32   RxDlyChain: 3;      //bit5,  Configure GMAC Receive Clock Delay Chain
+    __u32   ClkDiv: 2;          //bit8,  Clock pre-divide ratio(n)
+    __u32   reserved0: 22;      //bit10, reserved
+} __ccmu_gmac_clk_reg0164_t;
+
+typedef struct __CCMU_HDMI1_RST_REG0170 {
+    __u32   hrst: 1;            //bit0,  hreset
+    __u32   sysrst: 1;          //bit1,  HDMI1 system reset
+    __u32   AudioDmaRst: 1;     //bit2,  Audio dma reset
+    __u32   reserved0: 29;      //bit3,  reserved
+} __ccmu_hdmi1_rst_reg0170_t;
+
+typedef struct __CCMU_HDMI1_CTL_REG0174 {
+    __u32   ctl;                //bit0,  HDMI1 System Control Register
+} __ccmu_hdmi1_ctl_reg0174_t;
+
+typedef struct __CCMU_HDMI1_SHW_CLK_REG0178 {
+    __u32   reserved0: 31;      //bit0,  reserved
+    __u32   ClkEn: 1;           //bit31, Clock Output Enable
+} __ccmu_hdmi1_shw_clk_reg0178_t;
+
+typedef struct __CCMU_HDMI1_RPT_CLK_REG017C {
+    __u32   ClkDiv: 4;          //bit0,  Clock divide ratio(m)
+    __u32   reserved0: 20;      //bit4,  reserved
+    __u32   ClkSrc: 2;          //bit24, Clock Source Select
+    __u32   reserved1: 5;       //bit26, reserved
+    __u32   ClkEn: 1;           //bit31, Clock Output Enable
+} __ccmu_hdmi1_rpt_clk_reg017c_t;
+
+/* Clock output, used for clock outA/clock outB */
+/* register address is 0x01F0, 0x01F4 */
+typedef struct __CCMU_CLKOUT {
+    __u32   reserved0: 8;       //bit0,  reserved
+    __u32   ClkDivM: 5;         //bit8,  clock output divide Factor M (1~31)
+    __u32   reserved1: 7;       //bit13, reserved
+    __u32   ClkDivN: 2;         //bit20, Clock Output Divede FactorN, pre-divided by 2^n, 1/2/4/8 ex.
+    __u32   reserved2: 2;       //bit22, reserved
+    __u32   ClkSrc: 2;          //bit24, clock select, 00-HOSC/750=32K, 01-Ext.Losc(32768), 10-HOSC, 11-reserved
+    __u32   reserved3: 5;       //bit26, reserved
+    __u32   ClkEn: 1;           //bit31, Clock Output Enable, 0-Disable, 1-Enable
+} __ccmu_clkout_t;
 
 
 typedef struct __CCMU_REG_LIST
@@ -602,7 +674,8 @@ typedef struct __CCMU_REG_LIST
     volatile __u32                          Pll7Tune;   //0x0034, Pll7 tuning
     volatile __ccmu_pll1_tuning2_reg0038_t  Pll1Tune2;  //0x0038, Pll1 tuning2
     volatile __ccmu_pll5_tuning2_reg003c_t  Pll5Tune2;  //0x003C, Pll5 tuning2
-    volatile __u32                          reserved[4];//0x0040, reserved
+    volatile __ccmu_pll8_gpu_reg0040_t      Pll8Ctl;    //0x0040, pll8 control
+    volatile __u32                          reserved7[3];   //0x0044, reserved
     volatile __ccmu_osc24m_reg0050_t        HoscCtl;    //0x0050, OSC24M control
     volatile __ccmu_sysclkl_ratio_reg0054_t SysClkDiv;  //0x0054, AC328/AHB/APB0 divide ratio
     volatile __ccmu_apb1clk_ratio_reg0058_t Apb1ClkDiv; //0x0058, APB1 clock dividor
@@ -626,7 +699,7 @@ typedef struct __CCMU_REG_LIST
     volatile __ccmu_module0_clk_t           PataClk;    //0x00AC, PATA module clock control
     volatile __ccmu_module0_clk_t           Ir0Clk;     //0x00B0, IR0 module clock control
     volatile __ccmu_module0_clk_t           Ir1Clk;     //0x00B4, IR1 module clock control
-    volatile __ccmu_module1_clk_t           I2sClk;     //0x00B8, IIS module clock control
+    volatile __ccmu_module1_clk_t           I2s0Clk;     //0x00B8, IIS module clock control
     volatile __ccmu_module1_clk_t           Ac97Clk;    //0x00BC, AC97 module clock control
     volatile __ccmu_module1_clk_t           SpdifClk;   //0x00C0, SPDIF module clock control
     volatile __ccmu_keypad_clk_reg00c4_t    KeyPadClk;  //0x00C4, KEYPAD module clock control
@@ -634,7 +707,9 @@ typedef struct __CCMU_REG_LIST
     volatile __ccmu_usb_clk_reg00cc_t       UsbClk;     //0x00CC, USB module clock control
     volatile __ccmu_gps_clk_reg00d0_t       GpsClk;     //0x00D0, GPS module clock control
     volatile __ccmu_module0_clk_t           Spi3Clk;    //0x00D4, SPI3 module clock control
-    volatile __u32                          reserved2[10];  //0x00D8, reserved
+    volatile __ccmu_module1_clk_t           I2s1Clk;    //0x00D8, IIS1 module clock control
+    volatile __ccmu_module1_clk_t           I2s2Clk;    //0x00DC, IIS2 module clock control
+    volatile __u32                          reserved11[8];  //0x00E0, reserved
     volatile __ccmu_dram_gate_reg0100_t     DramGate;   //0x0100, DRAM gating
     volatile __ccmu_fedemp_clk_t            DeBe0Clk;   //0x0104, DE-BE 0 module clock control
     volatile __ccmu_fedemp_clk_t            DeBe1Clk;   //0x0108, DE-BE 1 module clock control
@@ -659,6 +734,16 @@ typedef struct __CCMU_REG_LIST
     volatile __ccmu_mali400_clk_reg0154_t   MaliClk;    //0x0154, MALI400 module clock control
     volatile __u32                          reserved13; //0x0158, reserved
     volatile __ccmu_mbus_clk_reg015c_t      MBusClk;    //0x015C, MBus module clock control
+    volatile __u32                          reserved14; //0x0160, reserved
+    volatile __ccmu_gmac_clk_reg0164_t      GmacClk;    //0x0164, GMAC module clock control
+    volatile __u32                          reserved15[2];  //0x0168, reserved
+    volatile __ccmu_hdmi1_rst_reg0170_t     Hdmi1Rst;   //0x0170, HDMI1 Reset Register
+    volatile __ccmu_hdmi1_ctl_reg0174_t     Hdmi1Ctl;   //0x0174, HDMI1 Control Register
+    volatile __ccmu_hdmi1_shw_clk_reg0178_t Hdmi1ShwClk;//0x0178, HDMI1 Show Clock Register
+    volatile __ccmu_hdmi1_rpt_clk_reg017c_t Hdmi1RptClk;//0x017C, HDMI1 Repeat Clock Register
+    volatile __u32                          reserved16[28]; //0x0180, reserved
+    volatile __ccmu_clkout_t                ClkOutA;    //0x01F0, Clock output A control
+    volatile __ccmu_clkout_t                ClkOutB;    //0x01F4, Clock output B control
 
 } __ccmu_reg_list_t;
 
